@@ -26,43 +26,32 @@
                 <div class="product-pic-zoom">
                   <img class="product-big-img" :src="foto" alt="" />
                 </div>
-                <div class="product-thumbs">
+                <div class="product-thumbs" v-if="productDetails.galleries.length > 0">
                   <carousel :dots="false" :nav="false" class="product-thumbs-track ps-slider">
-                    <div class="pt" @click="gantiFoto(thumbs[0])" :class="thumbs[0] == foto ? 'active' : '' ">
-                      <img src="img/mickey1.jpg" alt="" />
+                    
+                    <div
+                    v-for="ss in productDetails.galleries"
+                    :key="ss.id" 
+                    class="pt" 
+                    @click="gantiFoto(ss.photo)" 
+                    :class="ss.photo == foto ? 'active' : '' ">
+                      <img :src="ss.photo" alt="" />
                     </div>
 
-                    <div class="pt" @click="gantiFoto(thumbs[1])" :class="thumbs[1] == foto ? 'active' : '' ">
-                      <img src="img/mickey2.jpg" alt="" />
-                    </div>
-
-                    <div class="pt" @click="gantiFoto(thumbs[2])" :class="thumbs[2] == foto ? 'active' : '' ">
-                      <img src="img/mickey3.jpg" alt="" />
-                    </div>
-
-                    <div class="pt" @click="gantiFoto(thumbs[3])" :class="thumbs[3] == foto ? 'active' : '' ">
-                      <img src="img/mickey4.jpg" alt="" />
-                    </div>
                   </carousel>
                 </div>
-              </div>
+              </div> 
               <div class="col-lg-6">
                 <div class="product-details text-left">
                   <div class="pd-title">
-                    <span>goodie bag</span>
-                    <h3>Tas Mickey</h3>
+                    <span>{{ productDetails.type }}</span>
+                    <h3>{{ productDetails.name }}</h3>
                   </div>
                   <div class="pd-desc">
                     <p>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis, error officia. Rem aperiam laborum voluptatum vel, pariatur modi hic provident eum iure natus quos non a sequi, id accusantium! Autem.
+                      {{ productDetails.description }}
                     </p>
-                    <p>
-                      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quam possimus quisquam animi, commodi, nihil voluptate nostrum neque architecto illo officiis doloremque et corrupti cupiditate voluptatibus error illum.
-                      Commodi expedita animi nulla aspernatur. Id asperiores blanditiis, omnis repudiandae iste inventore cum, quam sint molestiae accusamus voluptates ex tempora illum sit perspiciatis. Nostrum dolor tenetur amet, illo
-                      natus magni veniam quia sit nihil dolores. Commodi ratione distinctio harum voluptatum velit facilis voluptas animi non laudantium, id dolorem atque perferendis enim ducimus? A exercitationem recusandae aliquam quod.
-                      Itaque inventore obcaecati, unde quam impedit praesentium veritatis quis beatae ea atque perferendis voluptates velit architecto?
-                    </p>
-                    <h4>$495.00</h4>
+                    <h4>${{productDetails.price}}</h4>
                   </div>
                   <div class="quantity">
                     <router-link to="/shopping" class="primary-btn pd-cart">Add To Cart</router-link>
@@ -91,6 +80,9 @@ import RelationHyung from "@/components/RelationHyung.vue";
 // ini buat aktifin carousel nye
 import carousel from "vue-owl-carousel";
 
+// ini buat make axios nya
+import axios from "axios"
+
 export default {
   name: "Product",
   components: {
@@ -99,21 +91,43 @@ export default {
     RelationHyung,
     carousel
   },
+
   data() {
     return {
-      foto: "img/mickey1.jpg",
+      foto:'',
       thumbs: ["img/mickey1.jpg", 
               "img/mickey2.jpg", 
               "img/mickey3.jpg", 
               "img/mickey4.jpg"
-              ]
+              ], 
+      productDetails: []
     };
   },
+
   methods: {
       gantiFoto(urlImage) {
           this.foto = urlImage;
-      }
-  }
+      // eslint-disable-next-line no-console
+      },
+       setDataFoto(data) {
+        // mengganti object productDetails make data dari API
+        this.productDetails = data;
+        // mengganti foto make data dari API
+        this.foto = data.galleries[0].photo;
+  },
+  },
+
+  mounted() {
+        axios
+        .get("http://127.0.0.1:8001/api/products", {
+          params: {
+             id: this.$route.params.id
+          }
+        })
+        .then(res => (this.setDataFoto(res.data.data)))
+        // eslint-disable-next-line no-console
+        .catch(err => console.log(err));
+    }
 };
 </script>
 
