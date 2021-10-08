@@ -7,7 +7,7 @@
           <div class="footer-left text-left">
             <div class="footer-logo">
               <a href="#">
-                <img src="img/hyungfooter.png" alt />
+                <img src="img/LOGOFOOTER.png" alt />
               </a>
             </div>
             <ul>
@@ -95,6 +95,6 @@ export default {
 
 <style scoped>
 .footer-logo a img {
-    max-height: 100px;
+    max-height: 1000px;
 }
 </style>
