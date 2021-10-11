@@ -48,13 +48,14 @@
                     <h3>{{ productDetails.name }}</h3>
                   </div>
                   <div class="pd-desc">
-                    <p>
-                      {{ productDetails.description }}
+                    <p v-html="productDetails.description">
                     </p>
                     <h4>${{productDetails.price}}</h4>
                   </div>
                   <div class="quantity">
-                    <router-link to="/shopping" class="primary-btn pd-cart">Add To Cart</router-link>
+                    <router-link to="/shopping">
+                    <a @click="saveKeranjang(productDetails.id, productDetails.name, productDetails.price, productDetails.galleries[0].photo)" href="#" class="primary-btn pd-cart">Add to Cart</a>
+                   </router-link>
                   </div>
                 </div>
               </div>
@@ -94,16 +95,12 @@ export default {
 
   data() {
     return {
-      foto:'',
-      thumbs: ["img/mickey1.jpg", 
-              "img/mickey2.jpg", 
-              "img/mickey3.jpg", 
-              "img/mickey4.jpg"
-              ], 
-      productDetails: []
+      foto:"",
+      productDetails: [],
+      keranjangUser: []
     };
   },
-
+  // ini untuk mengganti foto yang kita klik 
   methods: {
       gantiFoto(urlImage) {
           this.foto = urlImage;
@@ -114,10 +111,32 @@ export default {
         this.productDetails = data;
         // mengganti foto make data dari API
         this.foto = data.galleries[0].photo;
-  },
-  },
+      },
+      // untuk mengecek produk yang kita klik ini sesuai atau tidak dengan database nya based on id dan nama
+      saveKeranjang(idProduct, nameProduct, priceProduct, photoProduct) {
 
+        var productStored = {
+          "id": idProduct,
+          "name": nameProduct,
+          "price": priceProduct,
+          "photo": photoProduct
+        }
+        // push disini untuk memasukan item nya tersebut ke dalam variable productStored
+        this.keranjangUser.push(productStored)
+        const parsed = JSON.stringify(this.keranjangUser);
+        localStorage.setItem('keranjangUser', parsed);
+      }
+  },
+  // untuk memvalidasi apakah benar produk yang kita masukan berdasarkan data dari API
   mounted() {
+        if (localStorage.getItem('keranjangUser')) {
+      try {
+        this.keranjangUser = JSON.parse(localStorage.getItem('keranjangUser'));
+      } catch(e) {
+        localStorage.removeItem('keranjangUser');
+      }
+    }
+    // ini adalah untuk integrasi data API nya
         axios
         .get("http://127.0.0.1:8001/api/products", {
           params: {
